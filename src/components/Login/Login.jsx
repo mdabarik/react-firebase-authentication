@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, getAuth, signInWithPopup, signOut } from 'firebase/auth';
+import { GoogleAuthProvider, GithubAuthProvider, getAuth, signInWithPopup, signOut } from 'firebase/auth';
 import app from '../../firebase/firebase.init';
 import { useState } from 'react';
 
@@ -7,11 +7,12 @@ const Login = () => {
     const [user, setUser] = useState(null);
 
     const auth = getAuth(app)
-    console.log(app);
-    const provider = new GoogleAuthProvider()
+
+    const googleProvider = new GoogleAuthProvider()
+    const githubProvider = new GithubAuthProvider();
 
     const handleGoogleSignIn = () => {
-        signInWithPopup(auth, provider)
+        signInWithPopup(auth, googleProvider)
             .then(result => {
                 const loggedInUser = result.user;
                 console.log(loggedInUser)
@@ -25,7 +26,7 @@ const Login = () => {
 
     const handleSignOut = () => {
         signOut(auth)
-            .then(result => {
+            .then((res) => {
                 setUser(null);
             })
             .catch(error => {
@@ -33,17 +34,29 @@ const Login = () => {
             })
     }
 
+    const handleGithubSignIn = () => {
+        signInWithPopup(auth, githubProvider)
+        .then(result => {
+            const logedInUser = result.user;
+            console.log(logedInUser);
+            setUser(logedInUser)
+
+        })
+        .catch(error => {
+            console.log(error);;
+        })
+    }
+
     return (
         <div>
             {/* {user ? logout : sign in} */}
 
-            {  !user ?
-                <button
-                onClick={() => handleGoogleSignIn()}
-            >Google Login</button> :
-            <button
-                onClick={() => handleSignOut()}
-            >Signout</button>
+            {  user ?
+            <button onClick={() => handleSignOut()} >Signout</button> :
+                <div>
+                    <button onClick={() => handleGoogleSignIn()}>Google Login</button>
+                    <button onClick={() => handleGithubSignIn()}>Github Sign in</button>
+                </div>
             }
             {<div>
                 <h2>User: {user?.displayName}</h2>
